@@ -1,5 +1,7 @@
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
+import '/flutter_flow/flutter_flow_toggle_icon.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -79,86 +81,81 @@ class _HomePageWidgetState extends State<HomePageWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Builder(
-                  builder: (context) {
-                    final catNames = FFAppState().catNames.toList();
+                StreamBuilder<List<CatNamesRecord>>(
+                  stream: queryCatNamesRecord(),
+                  builder: (context, snapshot) {
+                    // Customize what your widget looks like when it's loading.
+                    if (!snapshot.hasData) {
+                      return Center(
+                        child: SizedBox(
+                          width: 50.0,
+                          height: 50.0,
+                          child: CircularProgressIndicator(
+                            color: FlutterFlowTheme.of(context).primary,
+                          ),
+                        ),
+                      );
+                    }
+                    List<CatNamesRecord> listViewCatNamesRecordList =
+                        snapshot.data!;
                     return ListView.separated(
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
-                      itemCount: catNames.length,
+                      itemCount: listViewCatNamesRecordList.length,
                       separatorBuilder: (_, __) => SizedBox(height: 16.0),
-                      itemBuilder: (context, catNamesIndex) {
-                        final catNamesItem = catNames[catNamesIndex];
-                        return Row(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              catNamesItem,
-                              style: FlutterFlowTheme.of(context).titleLarge,
-                            ),
-                            if (FFAppState()
-                                .favoriteCatNames
-                                .contains(catNamesItem))
-                              FlutterFlowIconButton(
-                                borderColor: Colors.transparent,
-                                borderRadius: 20.0,
-                                borderWidth: 0.0,
-                                buttonSize: 40.0,
-                                fillColor: Colors.transparent,
-                                icon: Icon(
+                      itemBuilder: (context, listViewIndex) {
+                        final listViewCatNamesRecord =
+                            listViewCatNamesRecordList[listViewIndex];
+                        return InkWell(
+                          splashColor: Colors.transparent,
+                          focusColor: Colors.transparent,
+                          hoverColor: Colors.transparent,
+                          highlightColor: Colors.transparent,
+                          onTap: () async {
+                            context.pushNamed(
+                              'DetailsPage',
+                              queryParameters: {
+                                'catDocument': serializeParam(
+                                  listViewCatNamesRecord,
+                                  ParamType.Document,
+                                ),
+                              }.withoutNulls,
+                              extra: <String, dynamic>{
+                                'catDocument': listViewCatNamesRecord,
+                              },
+                            );
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.max,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                listViewCatNamesRecord.name,
+                                style: FlutterFlowTheme.of(context).titleLarge,
+                              ),
+                              ToggleIcon(
+                                onPressed: () async {
+                                  await listViewCatNamesRecord.reference
+                                      .update({
+                                    'is_favorite':
+                                        !listViewCatNamesRecord.isFavorite,
+                                  });
+                                },
+                                value: listViewCatNamesRecord.isFavorite,
+                                onIcon: Icon(
                                   Icons.favorite_rounded,
                                   color: Color(0xFFFF0000),
-                                  size: 24.0,
+                                  size: 25.0,
                                 ),
-                                onPressed: () async {
-                                  if (FFAppState()
-                                      .favoriteCatNames
-                                      .contains(catNamesItem)) {
-                                    setState(() {
-                                      FFAppState().removeFromFavoriteCatNames(
-                                          catNamesItem);
-                                    });
-                                  } else {
-                                    setState(() {
-                                      FFAppState()
-                                          .addToFavoriteCatNames(catNamesItem);
-                                    });
-                                  }
-                                },
-                              ),
-                            if (!FFAppState()
-                                .favoriteCatNames
-                                .contains(catNamesItem))
-                              FlutterFlowIconButton(
-                                borderColor: Colors.transparent,
-                                borderRadius: 20.0,
-                                borderWidth: 0.0,
-                                buttonSize: 40.0,
-                                fillColor: Colors.transparent,
-                                icon: Icon(
+                                offIcon: Icon(
                                   Icons.favorite_border_rounded,
                                   color: Color(0xFFFF0000),
-                                  size: 24.0,
+                                  size: 25.0,
                                 ),
-                                onPressed: () async {
-                                  if (FFAppState()
-                                      .favoriteCatNames
-                                      .contains(catNamesItem)) {
-                                    setState(() {
-                                      FFAppState().removeFromFavoriteCatNames(
-                                          catNamesItem);
-                                    });
-                                  } else {
-                                    setState(() {
-                                      FFAppState()
-                                          .addToFavoriteCatNames(catNamesItem);
-                                    });
-                                  }
-                                },
                               ),
-                          ],
+                            ],
+                          ),
                         );
                       },
                     );

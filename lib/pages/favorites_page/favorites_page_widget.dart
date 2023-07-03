@@ -1,3 +1,4 @@
+import '/backend/backend.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -77,24 +78,40 @@ class _FavoritesPageWidgetState extends State<FavoritesPageWidget> {
             child: Column(
               mainAxisSize: MainAxisSize.max,
               children: [
-                Builder(
-                  builder: (context) {
-                    final favoriteCatNames =
-                        FFAppState().favoriteCatNames.toList();
+                StreamBuilder<List<CatNamesRecord>>(
+                  stream: queryCatNamesRecord(
+                    queryBuilder: (catNamesRecord) =>
+                        catNamesRecord.where('is_favorite', isEqualTo: true),
+                  ),
+                  builder: (context, snapshot) {
+                    // Customize what your widget looks like when it's loading.
+                    if (!snapshot.hasData) {
+                      return Center(
+                        child: SizedBox(
+                          width: 50.0,
+                          height: 50.0,
+                          child: CircularProgressIndicator(
+                            color: FlutterFlowTheme.of(context).primary,
+                          ),
+                        ),
+                      );
+                    }
+                    List<CatNamesRecord> listViewCatNamesRecordList =
+                        snapshot.data!;
                     return ListView.separated(
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
                       scrollDirection: Axis.vertical,
-                      itemCount: favoriteCatNames.length,
+                      itemCount: listViewCatNamesRecordList.length,
                       separatorBuilder: (_, __) => SizedBox(height: 16.0),
-                      itemBuilder: (context, favoriteCatNamesIndex) {
-                        final favoriteCatNamesItem =
-                            favoriteCatNames[favoriteCatNamesIndex];
+                      itemBuilder: (context, listViewIndex) {
+                        final listViewCatNamesRecord =
+                            listViewCatNamesRecordList[listViewIndex];
                         return Row(
                           mainAxisSize: MainAxisSize.max,
                           children: [
                             Text(
-                              favoriteCatNamesItem,
+                              listViewCatNamesRecord.name,
                               style: FlutterFlowTheme.of(context).titleLarge,
                             ),
                           ],
